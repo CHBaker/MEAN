@@ -1,3 +1,4 @@
+import { ErrorService } from './../errors/error.service';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -7,14 +8,19 @@ import 'rxjs/Rx';
 @Injectable()
 export class AuthService {
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient,
+                private errorService: ErrorService) {}
 
     signup(user: User) {
         const body = JSON.stringify(user);
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this.http.post('http://localhost:3000/user',
             body, { responseType: 'json', observe: 'response', headers: headers })
-            .catch((error) => Observable.throw(error.json()));
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            }
+        );
     }
 
     signin(user: User) {
@@ -22,7 +28,11 @@ export class AuthService {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this.http.post('http://localhost:3000/user/signin',
             body, { responseType: 'json', headers: headers })
-            .catch((error) => Observable.throw(error.json()));
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            }
+        );
     }
 
     logout() {

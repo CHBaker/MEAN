@@ -1,3 +1,5 @@
+import { ErrorService } from './errors/error.service';
+import { ErrorComponent } from './errors/error.component';
 import { AuthService } from './auth/auth.service';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -27,7 +29,8 @@ import { SigninComponent } from "./auth/signin.component";
         HeaderComponent,
         LogoutComponent,
         SignupComponent,
-        SigninComponent
+        SigninComponent,
+        ErrorComponent
     ],
     imports: [
         BrowserModule,
@@ -36,7 +39,7 @@ import { SigninComponent } from "./auth/signin.component";
         ReactiveFormsModule,
         HttpClientModule
     ],
-    providers: [AuthService],
+    providers: [AuthService, ErrorService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -1,3 +1,4 @@
+import { ErrorService } from './../errors/error.service';
 import { EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -11,7 +12,8 @@ export class MessageService {
     private messages: Message[] = [];
     messageIsEdit = new EventEmitter<Message>();
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient,
+                private errorService: ErrorService) {}
 
     addMessage(message: Message) {
         const body = JSON.stringify(message)
@@ -31,7 +33,10 @@ export class MessageService {
                     return message;
                 }
             )
-            .catch((error) => Observable.throw(error));
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            });
     }
 
     getMessages() {
@@ -50,7 +55,10 @@ export class MessageService {
                 this.messages = transformedMessages;
                 return transformedMessages;
             })
-            .catch((error) => Observable.throw(error.json())
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            }
         );
     }
 
@@ -65,7 +73,11 @@ export class MessageService {
         const headers = new HttpHeaders().set('Content-Type', 'application/json');
         return this.http.patch(`http://localhost:3000/message/${message.messageId}${token}`,
             body, { headers: headers, responseType: 'json', observe: 'response' })
-            .catch((error) => Observable.throw(error.json()));
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            }
+        );
     }
 
     deleteMessage(message: Message) {
@@ -73,6 +85,10 @@ export class MessageService {
         const token = localStorage.getItem('token') ? `?token=${localStorage.getItem('token')}` : '';
         return this.http.delete(`http://localhost:3000/message/${message.messageId}${token}`,
             { responseType: 'json', observe: 'response' })
-            .catch((error) => Observable.throw(error.json()));
+            .catch((error) => {
+                this.errorService.errorOccured.emit(error);
+                return Observable.throw(error);
+            }
+        );
     }
 }
